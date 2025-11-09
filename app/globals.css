@@ -49,7 +49,7 @@ h1 {
 
 .subtitle {
   color: #888;
-  margin-bottom: 2.5rem;
+  margin-bottom: 0.5rem;
   font-size: 1rem;
   font-weight: 300;
   line-height: 1.5;
@@ -58,6 +58,20 @@ h1 {
 @media (min-width: 768px) {
   .subtitle {
     font-size: 1.1rem;
+  }
+}
+
+.tagline {
+  color: #666;
+  margin-bottom: 2.5rem;
+  font-size: 0.9rem;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+  .tagline {
+    font-size: 0.95rem;
     margin-bottom: 3rem;
   }
 }
