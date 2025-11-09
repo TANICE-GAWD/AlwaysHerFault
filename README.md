@@ -5,7 +5,9 @@
 ## 📝 Description
 
 The AlwaysHerFault repository, a Next.js web application that translates honest statements into manipulative communication patterns. The system demonstrates psychological manipulation tactics by rewriting user input to shift blame, gaslight, and employ other toxic communication strategies.
-Disclaimer: This is just a fun side-project. Do not use this for any malicious work.
+
+
+## Disclaimer: This is just a fun side-project. Do not use this for any malicious work.
 
 ## Detection Request Flow
 
