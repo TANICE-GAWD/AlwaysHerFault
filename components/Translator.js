@@ -2,14 +2,21 @@
 
 import { useState } from 'react'
 import { tacticDefinitions } from '@/lib/tacticDefinitions'
+import { translateText, languages } from '@/lib/translator'
 
 export default function Translator() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
+  const [originalOutput, setOriginalOutput] = useState('')
   const [tactics, setTactics] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [selectedTactic, setSelectedTactic] = useState(null)
+  const [copied, setCopied] = useState(false)
+  const [selectedLanguage, setSelectedLanguage] = useState('en')
+  const [translating, setTranslating] = useState(false)
+
+  const MAX_LENGTH = 500
 
   const handleTranslate = async () => {
     if (!input.trim()) return
@@ -18,6 +25,8 @@ export default function Translator() {
     setError('')
     setOutput('')
     setTactics([])
+    setSelectedTactic(null)
+    setCopied(false)
 
     try {
       const response = await fetch('/api/translate', {
@@ -33,7 +42,9 @@ export default function Translator() {
       }
 
       setOutput(data.translated)
+      setOriginalOutput(data.translated)
       setTactics(data.tactics || [])
+      setSelectedLanguage('en')
     } catch (err) {
       setError(err.message)
     } finally {
@@ -47,32 +58,94 @@ export default function Translator() {
     }
   }
 
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(output)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  const handleLanguageChange = async (langCode) => {
+    if (langCode === selectedLanguage) return
+    
+    setTranslating(true)
+    setSelectedLanguage(langCode)
+    
+    try {
+      if (langCode === 'en') {
+        setOutput(originalOutput)
+      } else {
+        const translated = await translateText(originalOutput, langCode)
+        setOutput(translated)
+      }
+    } catch (err) {
+      setError('Translation to selected language failed')
+      setSelectedLanguage('en')
+      setOutput(originalOutput)
+    } finally {
+      setTranslating(false)
+    }
+  }
+
+  const charCount = input.length
+  const charCountClass = charCount > MAX_LENGTH ? 'error' : charCount > MAX_LENGTH * 0.8 ? 'warning' : ''
+
   return (
     <div className="translator">
-      <div>
-        <label htmlFor="input">Input Text</label>
+      <div className="input-wrapper">
+        <label htmlFor="input">
+          <span>Input Text</span>
+          <span className={`char-count ${charCountClass}`}>
+            {charCount}/{MAX_LENGTH}
+          </span>
+        </label>
         <textarea
           id="input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="e.g., I am sorry"
+          maxLength={MAX_LENGTH}
         />
       </div>
 
-      <button onClick={handleTranslate} disabled={loading || !input.trim()}>
-        {loading ? 'Processing...' : 'Translate'}
-      </button>
+      <div className="button-wrapper">
+        <button onClick={handleTranslate} disabled={loading || !input.trim()}>
+          {loading ? 'Processing' : 'Translate'}
+        </button>
+        
+      </div>
 
-      {loading && <div className="output loading">Analyzing and translating...</div>}
+      {loading && <div className="output loading">Analyzing and translating</div>}
 
       {output && (
         <div className="output">
-          <h3>Result</h3>
-          <p>{output}</p>
+          <div className="output-header">
+            <h3>Result</h3>
+            <div className="language-selector">
+              <select 
+                value={selectedLanguage} 
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                disabled={translating}
+              >
+                {languages.map(lang => (
+                  <option key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <p>{translating ? 'Translating...' : output}</p>
+          <button onClick={handleCopy} className={`copy-button ${copied ? 'copied' : ''}`} disabled={translating}>
+            {copied ? 'Copied!' : 'Copy Text'}
+          </button>
           {tactics.length > 0 && (
             <div className="tactics">
-              <h4>Detected Tactics</h4>
+              <h4>Detected Tactics (Click them)</h4>
               <div className="tactics-tags">
                 {tactics.map((tactic, index) => (
                   <button
@@ -87,7 +160,8 @@ export default function Translator() {
               </div>
               {selectedTactic && tacticDefinitions[selectedTactic] && (
                 <div className="tactic-explanation">
-                  <strong>{selectedTactic}:</strong> {tacticDefinitions[selectedTactic]}
+                  <strong>{selectedTactic}</strong>
+                  {tacticDefinitions[selectedTactic]}
                 </div>
               )}
             </div>

@@ -16,6 +16,14 @@ const nextConfig = {
       },
     ]
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/translate-lang',
+        destination: '/api/translate-lang',
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
