@@ -39,33 +39,38 @@ export default function Translator() {
     }
   }
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      handleTranslate()
+    }
+  }
+
   return (
     <div className="translator">
       <div>
-        <label htmlFor="input">
-          <strong>Enter your text:</strong>
-        </label>
+        <label htmlFor="input">Input Text</label>
         <textarea
           id="input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="e.g., I'm sorry, I made a mistake"
+          onKeyPress={handleKeyPress}
+          placeholder="Type your message here..."
         />
       </div>
 
       <button onClick={handleTranslate} disabled={loading || !input.trim()}>
-        {loading ? 'Translating...' : 'Translate'}
+        {loading ? 'Processing...' : 'Translate'}
       </button>
 
-      {loading && <div className="output loading">Generating translation...</div>}
+      {loading && <div className="output loading">Analyzing and translating...</div>}
 
       {output && (
         <div className="output">
-          <h3>Translated:</h3>
+          <h3>Result</h3>
           <p>{output}</p>
           {tactics.length > 0 && (
             <div className="tactics">
-              <h4>Manipulation Tactics Used:</h4>
+              <h4>Detected Tactics</h4>
               <div className="tactics-tags">
                 {tactics.map((tactic, index) => (
                   <span key={index} className="tactic-tag">
@@ -80,7 +85,7 @@ export default function Translator() {
 
       {error && (
         <div className="output error">
-          <h3>Error:</h3>
+          <h3>Error</h3>
           <p>{error}</p>
         </div>
       )}
