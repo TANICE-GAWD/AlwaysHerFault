@@ -110,6 +110,7 @@ export default function Translator() {
           placeholder="e.g., I am sorry"
           maxLength={MAX_LENGTH}
         />
+        
       </div>
 
       <div className="button-wrapper">
