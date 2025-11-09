@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { tacticDefinitions } from '@/lib/tacticDefinitions'
 
 export default function Translator() {
-  const [input, setInput] = useState('I am sorry')
+  const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [tactics, setTactics] = useState([])
   const [loading, setLoading] = useState(false)
@@ -56,7 +56,7 @@ export default function Translator() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message here..."
+          placeholder="e.g., I am sorry"
         />
       </div>
 
