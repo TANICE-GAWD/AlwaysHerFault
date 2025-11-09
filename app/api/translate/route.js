@@ -104,41 +104,29 @@ Translate this into a manipulative version (30-50 words): "${text}"
 
 Return ONLY the manipulative text. No quotes, no preamble.`
 
-    const result = await model.generateContent(prompt)
-    const response = await result.response
-    const translated = response.text()
+    const combinedPrompt = `${prompt}
 
-    // Second API call to identify tactics used
-    const tacticsPrompt = `Analyze this manipulative text and identify which manipulation tactics were used. Return ONLY a JSON array of tactic names from this list:
-- "DARVO"
-- "Word Salad"
-- "Guilt & Martyrdom"
-- "Love-Bombing"
-- "Minimization"
-- "Gaslighting"
-- "Projection"
-- "Weaponized Apology"
-- "Playing Victim"
-- "Blame Reversal"
+After providing the manipulative translation, on a new line add "TACTICS:" followed by a JSON array of tactics used from this list: DARVO, Word Salad, Guilt & Martyrdom, Love-Bombing, Minimization, Gaslighting, Projection, Weaponized Apology, Playing Victim, Blame Reversal
 
-Text to analyze: "${translated}"
+Format:
+[manipulative text]
+TACTICS: ["tactic1", "tactic2"]`
 
-Return format: ["tactic1", "tactic2", "tactic3"]
-Return ONLY the JSON array, nothing else.`
-
-    const tacticsResult = await model.generateContent(tacticsPrompt)
-    const tacticsResponse = await tacticsResult.response
-    const tacticsText = tacticsResponse.text().trim()
+    const result = await model.generateContent(combinedPrompt)
+    const response = result.response
+    const fullText = response.text().trim()
     
+    let translated = fullText
     let tactics = []
-    try {
-      
-      const jsonMatch = tacticsText.match(/\[.*\]/s)
-      if (jsonMatch) {
-        tactics = JSON.parse(jsonMatch[0])
+    
+    const tacticsMatch = fullText.match(/TACTICS:\s*(\[.*?\])/s)
+    if (tacticsMatch) {
+      translated = fullText.substring(0, tacticsMatch.index).trim()
+      try {
+        tactics = JSON.parse(tacticsMatch[1])
+      } catch (e) {
+        console.error('Failed to parse tactics:', e)
       }
-    } catch (e) {
-      console.error('Failed to parse tactics:', e)
     }
 
     return Response.json(

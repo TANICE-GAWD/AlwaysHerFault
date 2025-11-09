@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { tacticDefinitions } from '@/lib/tacticDefinitions'
 
 export default function Translator() {
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState('I am sorry')
   const [output, setOutput] = useState('')
   const [tactics, setTactics] = useState([])
   const [loading, setLoading] = useState(false)
