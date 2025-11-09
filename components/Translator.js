@@ -5,6 +5,7 @@ import { useState } from 'react'
 export default function Translator() {
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
+  const [tactics, setTactics] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -14,6 +15,7 @@ export default function Translator() {
     setLoading(true)
     setError('')
     setOutput('')
+    setTactics([])
 
     try {
       const response = await fetch('/api/translate', {
@@ -29,6 +31,7 @@ export default function Translator() {
       }
 
       setOutput(data.translated)
+      setTactics(data.tactics || [])
     } catch (err) {
       setError(err.message)
     } finally {
@@ -60,6 +63,18 @@ export default function Translator() {
         <div className="output">
           <h3>Translated:</h3>
           <p>{output}</p>
+          {tactics.length > 0 && (
+            <div className="tactics">
+              <h4>Manipulation Tactics Used:</h4>
+              <div className="tactics-tags">
+                {tactics.map((tactic, index) => (
+                  <span key={index} className="tactic-tag">
+                    {tactic}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

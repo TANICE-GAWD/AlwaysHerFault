@@ -104,7 +104,40 @@ Remember: Return ONLY the translated manipulative text. No quotation marks, no p
     const response = await result.response
     const translated = response.text()
 
-    return Response.json({ translated })
+    // Second API call to identify tactics used
+    const tacticsPrompt = `Analyze this manipulative text and identify which manipulation tactics were used. Return ONLY a JSON array of tactic names from this list:
+- "DARVO"
+- "Word Salad"
+- "Guilt & Martyrdom"
+- "Love-Bombing"
+- "Minimization"
+- "Gaslighting"
+- "Projection"
+- "Weaponized Apology"
+- "Playing Victim"
+- "Blame Reversal"
+
+Text to analyze: "${translated}"
+
+Return format: ["tactic1", "tactic2", "tactic3"]
+Return ONLY the JSON array, nothing else.`
+
+    const tacticsResult = await model.generateContent(tacticsPrompt)
+    const tacticsResponse = await tacticsResult.response
+    const tacticsText = tacticsResponse.text().trim()
+    
+    let tactics = []
+    try {
+      // Try to parse the JSON response
+      const jsonMatch = tacticsText.match(/\[.*\]/s)
+      if (jsonMatch) {
+        tactics = JSON.parse(jsonMatch[0])
+      }
+    } catch (e) {
+      console.error('Failed to parse tactics:', e)
+    }
+
+    return Response.json({ translated, tactics })
   } catch (error) {
     console.error('Translation error:', error)
     console.error('Error details:', error.message)

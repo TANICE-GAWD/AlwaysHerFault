@@ -108,3 +108,31 @@ button:disabled {
   color: #667eea;
   font-style: italic;
 }
+
+.tactics {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #e0e0e0;
+}
+
+.tactics h4 {
+  color: #764ba2;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.tactics-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tactic-tag {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: inline-block;
+}
