@@ -1,13 +1,16 @@
 # AlwaysHerFault
 
-![Next.js](https://img.shields.io/badge/-Next.js-blue?logo=nextjs&logoColor=white) ![React](https://img.shields.io/badge/-React-blue?logo=react&logoColor=white)
+
+
+## Disclaimer: This is just a fun side-project. Do not use this for any malicious work.
+
 
 ## 📝 Description
 
 The AlwaysHerFault repository, a Next.js web application that translates honest statements into manipulative communication patterns. The system demonstrates psychological manipulation tactics by rewriting user input to shift blame, gaslight, and employ other toxic communication strategies.
 
 
-## Disclaimer: This is just a fun side-project. Do not use this for any malicious work.
+
 
 ## Detection Request Flow
 
