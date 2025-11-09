@@ -1,18 +1,51 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { checkRateLimit, getClientIdentifier } from '@/lib/rateLimit'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
+const MAX_TEXT_LENGTH = 500
+const RATE_LIMIT_REQUESTS = 10
+const RATE_LIMIT_WINDOW = 60000
+
 export async function POST(request) {
   try {
+    const clientId = getClientIdentifier(request)
+    const rateLimitResult = checkRateLimit(clientId, RATE_LIMIT_REQUESTS, RATE_LIMIT_WINDOW)
+    
+    if (!rateLimitResult.allowed) {
+      return Response.json(
+        { 
+          error: `Rate limit exceeded. Try again in ${rateLimitResult.resetTime} seconds.`,
+          retryAfter: rateLimitResult.resetTime
+        },
+        { 
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': RATE_LIMIT_REQUESTS.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.resetTime.toString(),
+            'Retry-After': rateLimitResult.resetTime.toString()
+          }
+        }
+      )
+    }
+
     const { text } = await request.json()
 
-    if (!text || !text.trim()) {
-      return Response.json({ error: 'Text is required' }, { status: 400 })
+    if (!text || typeof text !== 'string' || !text.trim()) {
+      return Response.json({ error: 'Valid text is required' }, { status: 400 })
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      return Response.json(
+        { error: `Text too long. Maximum ${MAX_TEXT_LENGTH} characters.` },
+        { status: 400 }
+      )
     }
 
     if (!process.env.GEMINI_API_KEY) {
       console.error('GEMINI_API_KEY is not set')
-      return Response.json({ error: 'API key not configured' }, { status: 500 })
+      return Response.json({ error: 'Service temporarily unavailable' }, { status: 503 })
     }
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
@@ -108,12 +141,25 @@ Return ONLY the JSON array, nothing else.`
       console.error('Failed to parse tactics:', e)
     }
 
-    return Response.json({ translated, tactics })
+    return Response.json(
+      { translated, tactics },
+      {
+        headers: {
+          'X-RateLimit-Limit': RATE_LIMIT_REQUESTS.toString(),
+          'X-RateLimit-Remaining': rateLimitResult.remaining.toString(),
+          'X-RateLimit-Reset': rateLimitResult.resetTime.toString()
+        }
+      }
+    )
   } catch (error) {
     console.error('Translation error:', error)
-    console.error('Error details:', error.message)
+    
+    if (error.name === 'SyntaxError') {
+      return Response.json({ error: 'Invalid request format' }, { status: 400 })
+    }
+    
     return Response.json(
-      { error: `Failed to translate: ${error.message}` },
+      { error: 'Translation service error. Please try again.' },
       { status: 500 }
     )
   }

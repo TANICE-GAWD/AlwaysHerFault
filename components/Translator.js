@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { tacticDefinitions } from '@/lib/tacticDefinitions'
 
 export default function Translator() {
   const [input, setInput] = useState('')
@@ -8,6 +9,7 @@ export default function Translator() {
   const [tactics, setTactics] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedTactic, setSelectedTactic] = useState(null)
 
   const handleTranslate = async () => {
     if (!input.trim()) return
@@ -73,11 +75,21 @@ export default function Translator() {
               <h4>Detected Tactics</h4>
               <div className="tactics-tags">
                 {tactics.map((tactic, index) => (
-                  <span key={index} className="tactic-tag">
+                  <button
+                    key={index}
+                    className="tactic-tag"
+                    onClick={() => setSelectedTactic(selectedTactic === tactic ? null : tactic)}
+                    type="button"
+                  >
                     {tactic}
-                  </span>
+                  </button>
                 ))}
               </div>
+              {selectedTactic && tacticDefinitions[selectedTactic] && (
+                <div className="tactic-explanation">
+                  <strong>{selectedTactic}:</strong> {tacticDefinitions[selectedTactic]}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -87,6 +99,11 @@ export default function Translator() {
         <div className="output error">
           <h3>Error</h3>
           <p>{error}</p>
+          {error.includes('Rate limit') && (
+            <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+              Too many requests. Please wait before trying again.
+            </p>
+          )}
         </div>
       )}
     </div>
