@@ -4,7 +4,7 @@ import { checkRateLimit, getClientIdentifier } from '@/lib/rateLimit'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 const MAX_TEXT_LENGTH = 500
-const RATE_LIMIT_REQUESTS = 10
+const RATE_LIMIT_REQUESTS = 1000
 const RATE_LIMIT_WINDOW = 60000
 
 export async function POST(request) {
