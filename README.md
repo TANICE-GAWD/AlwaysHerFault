@@ -12,6 +12,7 @@ The AlwaysHerFault repository, a Next.js web application that translates honest 
 
 
 
+
 ## Detection Request Flow
 
 <img width="780" height="918" alt="image" src="https://github.com/user-attachments/assets/d177b81b-e828-409b-89cc-9324ac4ff0ac" />
