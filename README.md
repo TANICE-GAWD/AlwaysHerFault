@@ -2,7 +2,7 @@
 
 
 
-## Disclaimer: This is just a fun side-project. Do not use this for any malicious work.
+## Disclaimer: This is just a fun side-project. Do not use this for any malicious work. (The deployments is currently down :D)
 
 
 ## 📝 Description
